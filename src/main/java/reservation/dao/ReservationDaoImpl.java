@@ -1,3 +1,4 @@
+package reservation.dao;
 
 import jakarta.persistence.EntityManager; // Importa la clase para gestionar entidades
 import jakarta.persistence.LockModeType; // Importa la enumeración para tipos de bloqueo

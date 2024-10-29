@@ -1,70 +1,67 @@
-package reservation.controller.resource;
+package reservation.controller.resource;// Paquete donde se encuentra el controlador
 
-import org.slf4j.Logger; // Importa la clase para el registro de logs
-import org.slf4j.LoggerFactory; // Importa la fábrica de logs
-import org.springframework.beans.factory.annotation.Autowired; // Importa la anotación para la inyección de dependencias
+import jakarta.validation.Valid; // Importa la anotación para validar objetos
+import jakarta.validation.constraints.Min; // Importa la anotación para validar que el valor sea mínimo
+import org.Reservations.integration.resource.ReservationResource; // Importa la interfaz de recursos de reservas
+import org.slf4j.Logger; // Importa la interfaz de Logger
+import org.slf4j.LoggerFactory; // Importa la clase para crear instancias de Logger
+import org.springframework.beans.factory.annotation.Autowired; // Importa la anotación para inyección de dependencias
 import org.springframework.http.HttpStatus; // Importa la clase para manejar estados HTTP
-import org.springframework.http.ResponseEntity; // Importa la clase para construir respuestas HTTP
-import org.springframework.validation.annotation.Validated; // Importa la anotación para validar datos
-import org.springframework.web.bind.annotation.*; // Importa las anotaciones para manejar solicitudes web
+import org.springframework.http.ResponseEntity; // Importa la clase para encapsular la respuesta HTTP
+import org.springframework.validation.annotation.Validated; // Importa la anotación para validación de clases
+import org.springframework.web.bind.annotation.*; // Importa las anotaciones de Spring para manejar solicitudes web
 import reservation.dto.ReservationDTO;
-import reservation.dto.SearchReservationCriteriaDTO;
 import reservation.service.ReservationService;
 
-import java.util.List; // Importa la clase List para manejar colecciones
+import java.util.List; // Importa la clase List para manejar colecciones de reservas
 
 @RestController // Indica que esta clase es un controlador REST
-@RequestMapping("/reservation") // Especifica la ruta base para las reservas
-@Validated // Permite la validación de las entradas
+@RequestMapping("/reservation") // Mapea las solicitudes a la ruta "/reservation"
+@Validated // Activa la validación de parámetros en los métodos del controlador
 public class ReservationController implements ReservationResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReservationController.class); // Inicializa el logger
-    private final ReservationService service; // Declara el servicio de reservas
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReservationController.class); // Crea un logger para registrar eventos
+    private final ReservationService service; // Servicio para manejar la lógica de negocio de reservas
 
-    @Autowired // Inyecta el servicio a través del constructor
+    @Autowired // Inyección de dependencias para el servicio de reservas
     public ReservationController(ReservationService service) {
         this.service = service;
     }
 
-    // Método para obtener todas las reservas
-    @GetMapping
-    public ResponseEntity<List<ReservationDTO>> getReservations(SearchReservationCriteriaDTO criteria) {
-        LOGGER.info("Obtain all the reservations"); // Registra la acción
-        List<ReservationDTO> response = service.getReservations(criteria); // Llama al servicio para obtener reservas
-        return new ResponseEntity<>(response, HttpStatus.OK); // Retorna la lista de reservas con estado OK
+    @GetMapping // Maneja solicitudes GET a "/reservation"
+    public ResponseEntity<List<ReservationDTO>> getReservations() {
+        LOGGER.info("Obtain all the reservations"); // Registro de información
+        List<ReservationDTO> response = service.getReservations(); // Obtiene todas las reservas
+        return new ResponseEntity<>(response, HttpStatus.OK); // Devuelve la respuesta con estado 200 OK
     }
 
-    // Método para obtener una reserva por ID
-    @GetMapping("/{id}")
-    public ResponseEntity<ReservationDTO> getReservationById(@PathVariable Long id) {
-        LOGGER.info("Obtain information from a reservation with {}", id); // Registra la acción
-        ReservationDTO response = service.getReservationById(id); // Llama al servicio para obtener la reserva
-        return new ResponseEntity<>(response, HttpStatus.OK); // Retorna la reserva con estado OK
+    @GetMapping("/{id}") // Maneja solicitudes GET a "/reservation/{id}"
+    public ResponseEntity<ReservationDTO> getReservationById(@Min(1) @PathVariable Long id) {
+        LOGGER.info("Obtain information from a reservation with {}", id); // Registro de información
+        ReservationDTO response = service.getReservationById(id); // Obtiene la reserva por ID
+        return new ResponseEntity<>(response, HttpStatus.OK); // Devuelve la respuesta con estado 200 OK
     }
 
-    // Método para guardar una nueva reserva
-    @PostMapping
-    public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO reservation) {
-        LOGGER.info("Saving new reservation"); // Registra la acción
-        ReservationDTO response = service.save(reservation); // Llama al servicio para guardar la reserva
-        return new ResponseEntity<>(response, HttpStatus.CREATED); // Retorna la nueva reserva con estado CREATED
+    @PostMapping // Maneja solicitudes POST a "/reservation"
+    public ResponseEntity<ReservationDTO> save(@RequestBody @Valid ReservationDTO reservation) {
+        LOGGER.info("Saving new reservation"); // Registro de información
+        ReservationDTO response = service.save(reservation); // Guarda la nueva reserva
+        return new ResponseEntity<>(response, HttpStatus.CREATED); // Devuelve la respuesta con estado 201 CREATED
     }
 
-    // Método para actualizar una reserva existente
-    @PutMapping("/{id}")
-    public ResponseEntity<ReservationDTO> update(@PathVariable Long id, @RequestBody ReservationDTO reservation) {
-        LOGGER.info("Updating a reservation with {}", id); // Registra la acción
-        ReservationDTO response = service.update(id, reservation); // Llama al servicio para actualizar la reserva
+    @PutMapping("/{id}") // Maneja solicitudes PUT a "/reservation/{id}"
+    public ResponseEntity<ReservationDTO> update(@Min(1) @PathVariable Long id,
+                                                 @RequestBody @Valid ReservationDTO reservation) {
+        LOGGER.info("Updating a reservation with {}", id); // Registro de información
+        ReservationDTO response = service.update(id, reservation); // Actualiza la reserva por ID
 
-        return new ResponseEntity<>(response, HttpStatus.OK); // Retorna la reserva actualizada con estado OK
+        return new ResponseEntity<>(response, HttpStatus.OK); // Devuelve la respuesta con estado 200 OK
     }
 
-    // Método para eliminar una reserva por ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        LOGGER.info("Deleting a reservation with {}", id); // Registra la acción
-        service.delete(id); // Llama al servicio para eliminar la reserva
-        return new ResponseEntity<>(HttpStatus.OK); // Retorna estado OK tras la eliminación
+    @DeleteMapping("/{id}") // Maneja solicitudes DELETE a "/reservation/{id}"
+    public ResponseEntity<Void> delete(@Min(1) @PathVariable Long id) {
+        LOGGER.info("Deleting a reservation with {}", id); // Registro de información
+        service.delete(id); // Elimina la reserva por ID
+        return new ResponseEntity<>(HttpStatus.OK); // Devuelve la respuesta con estado 200 OK
     }
-
 }

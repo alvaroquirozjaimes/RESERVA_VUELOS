@@ -1,0 +1,21 @@
+<configuration>
+    <!-- Definición de un appender para salida por consola -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- Configuración del formato del mensaje de log -->
+        <encoder>
+            <!-- Define el patrón para la salida del log -->
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Configuración de un logger específico para la clase org.Reservations -->
+    <logger name="org.Reservations" level="debug"/>
+    <!-- Esto establece el nivel de log en 'debug' para todas las clases dentro del paquete 'org.Reservations' -->
+    <!-- Esto significa que todos los mensajes de log de nivel 'debug' y superior se mostrarán en la salida. -->
+
+    <!-- Configuración del logger raíz -->
+    <root level="info">
+        <!-- Se refiere al appender definido anteriormente -->
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

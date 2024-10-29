@@ -1,0 +1,77 @@
+# Configuración de gestión de la aplicación
+management:
+  info:
+    env:  # Información del entorno
+      enabled: true  # Habilitar la exposición de información del entorno
+  endpoint:
+    health:
+      show-details: always  # Mostrar detalles completos en el endpoint de salud
+
+  endpoints:
+    web:
+      base-path: /  # Definir la base para los endpoints de gestión
+      exposure:
+        include: "*"  # Exponer todos los endpoints de gestión (cuidado en producción)
+
+# Configuración del servidor
+server:
+  port: 8080  # Puerto en el que la aplicación escucha
+  compression:
+    enabled: true  # Habilitar la compresión de las respuestas
+    min-response-size: 2048  # Tamaño mínimo de respuesta para aplicar compresión
+    mime-types: application/json,application/xml,text/html,text/plain  # Tipos MIME a comprimir
+
+  servlet:
+    context-path: /api  # Definir el contexto de la aplicación
+
+# Información de la aplicación
+info:
+  application:
+    groupId: '@project.groupId@'  # Identificador del grupo (se reemplaza en el build)
+    artifactId: '@project.artifactId@'  # Identificador del artefacto
+    version: '@project.version@'  # Versión de la aplicación
+
+# Configuración del conector HTTP para acceder a servicios externos
+http-connector:
+  hosts:
+    api-catalog:  # Definición del conector para el servicio "api-catalog"
+      host: localhost  # Host donde se encuentra el servicio
+      port: 6070  # Puerto del servicio
+      endpoints:
+        get-city:  # Endpoint para obtener información de la ciudad
+          url: "/api/flights/catalog/city/{code}"  # URL del endpoint
+          readTimeout: 1000  # Tiempo de espera para lectura (en milisegundos)
+          writeTimeout: 1000  # Tiempo de espera para escritura (en milisegundos)
+          connectionTimeout: 2000  # Tiempo máximo para establecer la conexión (en milisegundos)
+
+# Configuración de Resilience4j para resiliencia en llamadas a servicios
+resilience4j:
+  circuitbreaker:  # Configuración del circuito breaker
+    configs:
+      default:
+        failure-rate-threshold: 50  # Umbral de tasa de fallo (en %)
+        sliding-window-type: count_based  # Tipo de ventana deslizante (basada en conteo)
+        sliding-window-size: 5  # Tamaño de la ventana deslizante (número de llamadas)
+
+        automatic-transition-from-open-to-half-open-enabled: true  # Permitir transición automática de estado
+        wait-duration-in-open-state: 10s  # Tiempo en el que el circuito está abierto
+        permitted-number-of-calls-in-half-open-state: 1  # Número permitido de llamadas en estado semiabierto
+
+        register-health-indicator: false  # No registrar el indicador de salud para el circuito breaker
+        record-exceptions:
+          - io.netty.handler.timeout.ReadTimeoutException  # Excepciones a registrar para el circuito breaker
+          - java.lang.RuntimeException
+          - java.lang.Exception
+    instances:
+      api-catalog:  # Configuración específica para el circuito breaker de "api-catalog"
+        base-config: default  # Usar la configuración base por defecto
+
+  ratelimiter:  # Configuración del limitador de tasa
+    configs:
+      default:
+        limit-for-period: 2  # Límite de llamadas por período
+        limit-refresh-period: 3s  # Periodo de refresco del límite
+        timeout-duration: 1s  # Tiempo de espera para obtener un permiso de llamada
+    instances:
+      post-reservation:  # Configuración específica para el limitador de tasa de "post-reservation"
+        base-config: default  # Usar la configuración base por defecto

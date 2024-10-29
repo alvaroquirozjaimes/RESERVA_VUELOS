@@ -1,57 +1,57 @@
-package reservation.exception;
+package reservation.exception;// Paquete donde se encuentra la clase PersonalException
 
-import org.springframework.http.HttpStatus;
+// Importa la enumeración APIError para manejar errores de la API
+import org.springframework.http.HttpStatus; // Importa HttpStatus para manejar códigos de estado HTTP
 import reservation.enums.APIError;
 
-import java.util.List;
+import java.util.List; // Importa List para manejar listas de razones
 
-// Clase personalizada de excepción para manejar errores específicos de la aplicación
+// Definición de la excepción personalizada PersonalException que extiende RuntimeException
 public class PersonalException extends RuntimeException {
-    // Estado HTTP asociado con la excepción
-    private HttpStatus status;
+    private HttpStatus status; // Código de estado HTTP asociado a la excepción
+    private String description; // Descripción del error
+    private List<String> reasons; // Lista de razones que explican el error
 
-    // Descripción del error
-    private String description;
-
-    // Lista de razones o mensajes adicionales que explican el error
-    private List<String> reasons;
-
-    // Constructor que toma un objeto APIError para establecer el estado y la descripción
+    // Constructor que toma un APIError para inicializar la excepción
     public PersonalException(APIError error) {
-        this.status = error.getHttpStatus(); // Asigna el estado HTTP
-        this.description = error.getMessage(); // Asigna la descripción del error
+        this.status = error.getHttpStatus(); // Inicializa el estado HTTP
+        this.description = error.getMessage(); // Inicializa la descripción del error
     }
 
-    // Constructor que permite establecer estado, descripción y razones personalizadas
+    // Constructor que permite establecer el estado, la descripción y las razones
     public PersonalException(HttpStatus status, String description, List<String> reasons) {
-        this.status = status; // Asigna el estado HTTP
-        this.description = description; // Asigna la descripción del error
-        this.reasons = reasons; // Asigna las razones del error
+        this.status = status; // Inicializa el estado HTTP
+        this.description = description; // Inicializa la descripción del error
+        this.reasons = reasons; // Inicializa la lista de razones
     }
 
-    // Métodos getters y setters para acceder y modificar los campos
-
+    // Método getter para obtener el estado HTTP
     public HttpStatus getStatus() {
-        return status; // Retorna el estado HTTP
+        return status;
     }
 
+    // Método setter para establecer el estado HTTP
     public void setStatus(HttpStatus status) {
-        this.status = status; // Permite modificar el estado HTTP
+        this.status = status;
     }
 
+    // Método getter para obtener la descripción del error
     public String getDescription() {
-        return description; // Retorna la descripción del error
+        return description;
     }
 
+    // Método setter para establecer la descripción del error
     public void setDescription(String description) {
-        this.description = description; // Permite modificar la descripción del error
+        this.description = description;
     }
 
+    // Método getter para obtener la lista de razones
     public List<String> getReasons() {
-        return reasons; // Retorna la lista de razones del error
+        return reasons;
     }
 
+    // Método setter para establecer la lista de razones
     public void setReasons(List<String> reasons) {
-        this.reasons = reasons; // Permite modificar la lista de razones del error
+        this.reasons = reasons;
     }
 }

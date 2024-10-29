@@ -1,43 +1,108 @@
-package reservation.repository;
+package reservation.repository;// Especifica el paquete al que pertenece la clase.
 
-import org.springframework.data.domain.Pageable;  // Importa la interfaz para la paginación
-import org.springframework.data.jpa.domain.Specification;  // Importa la interfaz Specification para criterios de búsqueda
-import org.springframework.data.jpa.repository.JpaRepository;  // Importa la interfaz JpaRepository para operaciones CRUD
-import org.springframework.data.jpa.repository.Query;  // Importa la anotación Query para consultas personalizadas
-import org.springframework.data.repository.query.Param;  // Importa la anotación Param para parámetros de consulta
-import org.springframework.transaction.annotation.Transactional;  // Importa la anotación para la gestión de transacciones
-import reservation.model.Reservation;
+import org.springframework.stereotype.Component; // Importa la anotación Component de Spring.
+import reservation.model.*;
 
-import java.time.LocalDate;  // Importa la clase LocalDate para manejar fechas
-import java.util.List;  // Importa la clase List para manejar listas
+import java.math.BigDecimal; // Importa BigDecimal para trabajar con precios.
+import java.time.LocalDate; // Importa LocalDate para manejar fechas.
+import java.util.*; // Importa las colecciones de Java.
 
-// Interfaz que extiende JpaRepository para la entidad Reservation
-public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+@Component // Marca esta clase como un componente de Spring, lo que permite su inyección de dependencias.
+public class ReservationRepository {
 
-    // Consultas definidas como constantes
-    String QUERY_FIND_BY_CREATION_DATE = "SELECT r FROM Reservation r WHERE r.creationDate = :creationDate";
-    String QUERY_FIND_BY_CREATION_DATE_AND_FIRSTNAME = "SELECT r FROM Reservation r JOIN r.passengers p WHERE r.creationDate = :creationDate AND p.firstName = :firstName";
-    String QUERY_FIND_BY_CREATION_DATE_AND_FIRSTNAME_AND_LASTNAME = "SELECT r FROM Reservation r JOIN r.passengers p WHERE r.creationDate = :creationDate AND p.firstName = :firstName AND p.lastName = :lastName";
+    // Lista estática que almacenará las reservas en memoria.
+    static List<Reservation> reservations = new ArrayList<>();
 
-    // Consulta para encontrar reservas por fecha de creación
-    @Query(value = QUERY_FIND_BY_CREATION_DATE)
-    List<Reservation> findByCreationDate(@Param("creationDate") LocalDate creationDate);
+    // Bloque estático para inicializar datos de ejemplo.
+    static {
+        // Crea un nuevo pasajero y establece sus atributos.
+        Passenger passenger = new Passenger();
+        passenger.setFirstName("Alvaro");
+        passenger.setLastName("Quiroz");
+        passenger.setId(1L);
+        passenger.setDocumentType("DNI");
+        passenger.setDocumentNumber("12345678");
+        passenger.setBirthday(LocalDate.of(1985, 1, 1));
 
-    // Consulta para encontrar reservas por fecha de creación y nombre de pasajero
-    @Query(QUERY_FIND_BY_CREATION_DATE_AND_FIRSTNAME)
-    List<Reservation> findByCreationDateAndPassengersFirstName(@Param("creationDate") LocalDate creationDate,
-                                                               @Param("firstName") String firstName);
+        // Crea un nuevo precio y establece sus atributos.
+        Price price = new Price();
+        price.setBasePrice(BigDecimal.ONE);
+        price.setTotalTax(BigDecimal.ZERO);
+        price.setTotalPrice(BigDecimal.ONE);
 
-    // Consulta para encontrar reservas por fecha de creación, nombre y apellido de pasajero
-    @Query(QUERY_FIND_BY_CREATION_DATE_AND_FIRSTNAME_AND_LASTNAME)
-    List<Reservation> findByCreationDateAndPassengersFirstNameAndPassengersLastName(
-            @Param("creationDate") LocalDate creationDate, @Param("firstName") String firstName,
-            @Param("lastName") String lastName);
+        // Crea un nuevo segmento y establece sus atributos.
+        Segment segment = new Segment();
+        segment.setArrival("2025-01-01");
+        segment.setDeparture("2024-12-31");
+        segment.setOrigin("EZE");
+        segment.setDestination("MIA");
+        segment.setCarrier("AA");
+        segment.setId(1L);
 
-    // Método para encontrar todas las reservas usando una especificación y paginación
-    @Transactional(readOnly = true, timeout = 30)  // Configura la transacción como de solo lectura
-    List<Reservation> findAll(Specification<Reservation> specification, Pageable pageable);
+        // Crea un nuevo itinerario y establece sus atributos.
+        Itinerary itinerary = new Itinerary();
+        itinerary.setId(1L);
+        itinerary.setPrice(price);
+        itinerary.setSegment(List.of(segment)); // Agrega el segmento a la lista del itinerario.
 
-    // Método para obtener todas las reservas ordenadas por fecha de creación en orden descendente
-    List<Reservation> findAllByOrderByCreationDateDesc();
+        // Crea una nueva reserva y establece sus atributos.
+        Reservation reservation = new Reservation();
+        reservation.setId(1L);
+        reservation.setPassengers(List.of(passenger)); // Agrega el pasajero a la lista de la reserva.
+        reservation.setItinerary(itinerary); // Asocia el itinerario a la reserva.
+
+        // Agrega la reserva a la lista de reservas.
+        reservations.add(reservation);
+    }
+
+    // Método para obtener todas las reservas.
+    public List<Reservation> getReservations() {
+        return reservations; // Devuelve la lista de reservas.
+    }
+
+    // Método para obtener una reserva por su ID.
+    public Optional<Reservation> getReservationById(Long id) {
+        // Filtra las reservas para encontrar la que coincide con el ID proporcionado.
+        List<Reservation> result = reservations.stream()
+                .filter(reservation -> Objects.equals(reservation.getId(), id))
+                .toList();
+
+        // Obtiene la primera reserva del resultado, si existe, y la devuelve como un Optional.
+        Reservation reservation = !result.isEmpty() ? result.get(0) : null;
+        return Optional.ofNullable(reservation);
+    }
+
+    // Método para guardar una nueva reserva.
+    public Reservation save(Reservation reservation) {
+        // Establece un nuevo ID para la reserva, basado en el tamaño actual de la lista.
+        reservation.setId((long) (reservations.size() + 1));
+        reservations.add(reservation); // Agrega la reserva a la lista.
+        return reservation; // Devuelve la reserva guardada.
+    }
+
+    // Método para actualizar una reserva existente.
+    public Reservation update(Long id, Reservation reservation) {
+        // Filtra las reservas para encontrar la que coincide con el ID proporcionado.
+        List<Reservation> result = reservations.stream()
+                .filter(reser -> reser.getId().equals(id))
+                .toList();
+
+        // Actualiza los atributos de la reserva encontrada con los nuevos valores.
+        result.get(0).setId(reservation.getId());
+        result.get(0).setItinerary(reservation.getItinerary());
+        result.get(0).setPassengers(reservation.getPassengers());
+
+        return result.get(0); // Devuelve la reserva actualizada.
+    }
+
+    // Método para eliminar una reserva por su ID.
+    public void delete(Long id) {
+        // Filtra las reservas para encontrar la que coincide con el ID proporcionado.
+        List<Reservation> result = reservations.stream()
+                .filter(reservation -> reservation.getId().equals(id))
+                .toList();
+
+        // Elimina la reserva encontrada de la lista.
+        reservations.remove(result.get(0));
+    }
 }

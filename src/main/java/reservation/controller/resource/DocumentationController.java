@@ -1,31 +1,30 @@
-package reservation.controller.resource;
+package reservation.controller.resource; // Paquete donde se encuentra el controlador
 
-import io.swagger.v3.oas.annotations.Hidden; // Importa la anotación para ocultar el controlador en la documentación de Swagger
-import jakarta.servlet.http.HttpServletResponse; // Importa la clase para gestionar la respuesta HTTP
-import org.springframework.stereotype.Controller; // Importa la anotación para definir un controlador
+import io.swagger.v3.oas.annotations.Hidden; // Importa la anotación para ocultar la clase de la documentación de Swagger
+import jakarta.servlet.http.HttpServletResponse; // Importa la clase para manejar la respuesta HTTP
+import org.springframework.stereotype.Controller; // Importa la anotación para definir un controlador de Spring
 import org.springframework.web.bind.annotation.GetMapping; // Importa la anotación para manejar solicitudes GET
-import org.springframework.web.bind.annotation.RequestMapping; // Importa la anotación para especificar la ruta del controlador
-import org.springframework.web.bind.annotation.ResponseBody; // Importa la anotación para indicar que el cuerpo de la respuesta será manejado directamente
-import java.io.IOException; // Importa la clase IOException para manejar excepciones de entrada/salida
+import org.springframework.web.bind.annotation.RequestMapping; // Importa la anotación para mapear solicitudes
+import org.springframework.web.bind.annotation.ResponseBody; // Importa la anotación para indicar que el método devuelve un cuerpo de respuesta
+import java.io.IOException; // Importa la clase para manejar excepciones de entrada/salida
 
-@Hidden // Indica que este controlador debe ser ocultado en la documentación generada por Swagger
-@Controller // Indica que esta clase es un controlador de Spring MVC
-@RequestMapping("documentation") // Especifica que todas las rutas en este controlador comienzan con "documentation"
+@Hidden // Indica que esta clase no debe aparecer en la documentación de Swagger
+@Controller // Define la clase como un controlador de Spring
+@RequestMapping("documentation") // Mapea las solicitudes a la ruta "/documentation"
 public class DocumentationController {
 
-    @ResponseBody // Indica que el retorno del método será el cuerpo de la respuesta
-    @GetMapping // Mapea las solicitudes GET a este método
+    @ResponseBody // Indica que el método devuelve un cuerpo de respuesta
+    @GetMapping // Maneja las solicitudes GET a "/documentation"
     public void redirectToDocumentation(HttpServletResponse response) {
         try {
-            // Redirige al usuario a la URL "swagger-ui.html"
+            // Redirige a la URL de la interfaz de Swagger UI
             response.sendRedirect("swagger-ui.html");
-        } catch (IOException e) {
-            // Manejo de excepciones en caso de error durante la redirección
-            StringBuilder sb = new StringBuilder("UNEXPECTED ERROR: ");
-            if (e.getMessage() != null) {
-                sb.append(e.getMessage()); // Agrega el mensaje de la excepción al StringBuilder
+        } catch (IOException e) { // Maneja excepciones de entrada/salida
+            StringBuilder sb = new StringBuilder("UNEXPECTED ERROR: "); // Construye un mensaje de error
+            if (e.getMessage() != null) { // Si hay un mensaje de error, lo agrega al mensaje
+                sb.append(e.getMessage());
             }
-            // Aquí podrías registrar el error o lanzar una excepción personalizada si lo deseas
+            // Aquí podrías agregar un manejo adicional para registrar el error o enviar una respuesta de error
         }
     }
 }

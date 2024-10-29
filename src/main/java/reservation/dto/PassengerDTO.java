@@ -1,63 +1,104 @@
 package reservation.dto;
 
-import java.time.LocalDate; // Importa la clase LocalDate para manejar fechas
+import jakarta.validation.constraints.NotBlank; // Importa la anotación para validar que un campo no esté vacío
+import jakarta.validation.constraints.Past; // Importa la anotación para validar que una fecha esté en el pasado
 
-// Clase que representa un pasajero en el sistema de reservas
+import java.time.LocalDate; // Importa la clase LocalDate para manejar fechas
+import java.util.Objects; // Importa la clase Objects para métodos de comparación y hash
+
+// Clase Data Transfer Object (DTO) que representa un pasajero
 public class PassengerDTO {
 
+    // Anotación que valida que el campo firstName no esté vacío
+    @NotBlank(message = "firstName is mandatory")
     private String firstName; // Nombre del pasajero
-    private String lastName; // Apellido del pasajero
-    private String documentNumber; // Número de documento del pasajero
-    private String documentType; // Tipo de documento del pasajero (ej. DNI, Pasaporte)
-    private LocalDate birthday; // Fecha de nacimiento del pasajero
 
-    // Método que devuelve el nombre del pasajero
+    // Anotación que valida que el campo lastName no esté vacío
+    @NotBlank(message = "lastName is mandatory")
+    private String lastName; // Apellido del pasajero
+
+    private String documentNumber; // Número de documento del pasajero
+    private String documentType; // Tipo de documento del pasajero
+
+    // Anotación que valida que la fecha de cumpleaños esté en el pasado
+    @Past(message = "birthday need to be a date in the past")
+    private LocalDate birthday; // Fecha de cumpleaños del pasajero
+
+    // Método getter para obtener el nombre del pasajero
     public String getFirstName() {
-        return firstName; // Retorna el nombre
+        return firstName;
     }
 
-    // Método que establece el nombre del pasajero
+    // Método setter para establecer el nombre del pasajero
     public void setFirstName(String firstName) {
         this.firstName = firstName; // Asigna el nombre
     }
 
-    // Método que devuelve el apellido del pasajero
+    // Método getter para obtener el apellido del pasajero
     public String getLastName() {
-        return lastName; // Retorna el apellido
+        return lastName;
     }
 
-    // Método que establece el apellido del pasajero
+    // Método setter para establecer el apellido del pasajero
     public void setLastName(String lastName) {
         this.lastName = lastName; // Asigna el apellido
     }
 
-    // Método que devuelve el número de documento del pasajero
+    // Método getter para obtener el número de documento del pasajero
     public String getDocumentNumber() {
-        return documentNumber; // Retorna el número de documento
+        return documentNumber;
     }
 
-    // Método que establece el número de documento del pasajero
+    // Método setter para establecer el número de documento del pasajero
     public void setDocumentNumber(String documentNumber) {
         this.documentNumber = documentNumber; // Asigna el número de documento
     }
 
-    // Método que devuelve el tipo de documento del pasajero
+    // Método getter para obtener el tipo de documento del pasajero
     public String getDocumentType() {
-        return documentType; // Retorna el tipo de documento
+        return documentType;
     }
 
-    // Método que establece el tipo de documento del pasajero
+    // Método setter para establecer el tipo de documento del pasajero
     public void setDocumentType(String documentType) {
         this.documentType = documentType; // Asigna el tipo de documento
     }
 
-    // Método que devuelve la fecha de nacimiento del pasajero
+    // Método getter para obtener la fecha de cumpleaños del pasajero
     public LocalDate getBirthday() {
-        return birthday; // Retorna la fecha de nacimiento
+        return birthday;
     }
 
-    // Método que establece la fecha de nacimiento del pasajero
+    // Método setter para establecer la fecha de cumpleaños del pasajero
     public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday; // Asigna la fecha de nacimiento
+        this.birthday = birthday; // Asigna la fecha de cumpleaños
+    }
+
+    // Método que compara si dos objetos PassengerDTO son iguales
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) // Compara si son la misma instancia
+            return true;
+        if (o == null || getClass() != o.getClass()) // Verifica si el objeto es nulo o de una clase diferente
+            return false;
+        PassengerDTO that = (PassengerDTO) o; // Convierte el objeto a PassengerDTO
+        // Compara los atributos para determinar igualdad
+        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName)
+                && Objects.equals(documentNumber, that.documentNumber)
+                && Objects.equals(documentType, that.documentType) && Objects.equals(birthday, that.birthday);
+    }
+
+    // Método que genera un código hash para el objeto PassengerDTO
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, documentNumber, documentType, birthday); // Utiliza el método hash para los atributos relevantes
+    }
+
+    // Método que devuelve una representación en cadena del objeto PassengerDTO
+    @Override
+    public String toString() {
+        return "PassengerDTO{" + "firstName='" + firstName + '\'' + ", lastName='" + lastName + '\''
+                + ", documentNumber='" + documentNumber + '\'' + ", documentType='" + documentType + '\''
+                + ", birthday=" + birthday + '}'; // Representa los atributos en formato de cadena
     }
 }

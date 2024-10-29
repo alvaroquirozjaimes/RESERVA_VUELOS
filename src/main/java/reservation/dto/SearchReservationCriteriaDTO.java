@@ -1,7 +1,6 @@
 package reservation.dto;
 
 import java.time.LocalDate; // Importa la clase LocalDate para manejar fechas
-
 // Clase que representa los criterios de búsqueda para las reservas
 public class SearchReservationCriteriaDTO {
 

@@ -1,0 +1,22 @@
+version: '3.1'  # Especifica la versión de Docker Compose que se está utilizando.
+
+services:  # Define los servicios que se van a ejecutar en contenedores Docker.
+
+  api-catalog:  # Nombre del servicio para la API de catálogo.
+    image: adschosen/api-catalog:1.1.0  # Especifica la imagen de Docker que se utilizará para este servicio.
+    container_name: api-catalog  # Nombre asignado al contenedor en ejecución.
+    ports:  # Mapeo de puertos entre el host y el contenedor.
+      - 6070:6070  # Expone el puerto 6070 del contenedor en el puerto 6070 del host.
+    restart: always  # Configura el contenedor para que se reinicie automáticamente si se detiene.
+    links:  # Permite la comunicación entre contenedores.
+      - api-catalog-db  # Establece un enlace con el servicio 'api-catalog-db'.
+
+  api-catalog-db:  # Nombre del servicio para la base de datos MySQL.
+    container_name: api-catalog-db  # Nombre asignado al contenedor de la base de datos.
+    image: mysql:8.0  # Especifica la imagen de Docker para MySQL, versión 8.0.
+    restart: always  # Configura el contenedor para que se reinicie automáticamente si se detiene.
+    environment:  # Define variables de entorno para el contenedor.
+      MYSQL_DATABASE: 'flights_catalog'  # Nombre de la base de datos que se creará al iniciar el contenedor.
+      MYSQL_ROOT_PASSWORD: 'muppet'  # Contraseña para el usuario root de MySQL.
+    ports:  # Mapeo de puertos para el contenedor de la base de datos.
+      - 3310:3306  # Expone el puerto 3306 del contenedor en el puerto 3310 del host.
